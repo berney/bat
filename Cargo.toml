@@ -74,8 +74,9 @@ execute = { version = "0.3.0", optional = true }
 terminal-colorsaurus = "1.0"
 unicode-segmentation = "1.13.2"
 itertools = "0.14.0"
-# shortcut: local path until pi-mermaid is published on crates.io (can1357/oh-my-pi#16752); switch to a version then.
-pi-mermaid = { path = "/var/home/bdawg/co/git/oh-my-pi/.worktrees/local-mermaid-crate-with-layout-fix/crates/pi-mermaid" }
+# shortcut: git rev until pi-mermaid is published on crates.io (can1357/oh-my-pi#16752); switch to a version then.
+# The rev is can1357/oh-my-pi#16752 plus the layout fix from #16774.
+pi-mermaid = { git = "https://github.com/berney/oh-my-pi", rev = "03ea4c1af78fc6575140c85d134b03ba066440b6" }
 
 [dependencies.gix]
 version = "0.86"

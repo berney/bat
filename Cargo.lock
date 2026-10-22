@@ -2019,6 +2019,7 @@ checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
 [[package]]
 name = "pi-mermaid"
 version = "18.12.6"
+source = "git+https://github.com/berney/oh-my-pi?rev=03ea4c1af78fc6575140c85d134b03ba066440b6#03ea4c1af78fc6575140c85d134b03ba066440b6"
 dependencies = [
  "html-escape",
  "unicode-segmentation",
