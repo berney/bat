@@ -153,6 +153,7 @@ dependencies = [
  "nu-ansi-term",
  "once_cell",
  "path_abs",
+ "pi-mermaid",
  "plist",
  "predicates",
  "prettyplease",
@@ -1692,6 +1693,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
+name = "html-escape"
+version = "0.2.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c9356095b4b41197bba32173600e1582792cda618f65d12f68e2e77d273413c5"
+
+[[package]]
 name = "id-arena"
 version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2008,6 +2015,15 @@ name = "percent-encoding"
 version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
+
+[[package]]
+name = "pi-mermaid"
+version = "18.12.6"
+dependencies = [
+ "html-escape",
+ "unicode-segmentation",
+ "unicode-width",
+]
 
 [[package]]
 name = "pkg-config"
