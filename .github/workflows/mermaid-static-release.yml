@@ -1,0 +1,82 @@
+# Builds a static musl bat with the pi-mermaid renderer and publishes it as
+# a GitHub release, so other hosts can download one binary.
+#
+# Only pushes to this branch start it. Upstream's CICD.yml runs on master and
+# on tag pushes; the release tag made here uses GITHUB_TOKEN, and events from
+# GITHUB_TOKEN start no other workflow runs, so CICD.yml stays quiet.
+name: Static mermaid release
+
+on:
+  push:
+    branches: [mermaid-static]
+
+permissions: {}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # rust:alpine (rustc 1.99.1): musl-gcc for the Oniguruma C code.
+    container: docker.io/library/rust@sha256:3ea887915f261f273d6a24efdfdb92665dee12199923e57870453644fe4ae5c9
+    permissions:
+      contents: write # create the release and its tag
+      id-token: write # sign the provenance attestation
+      attestations: write
+    env:
+      TARGET: x86_64-unknown-linux-musl
+    steps:
+      - name: Install build tools
+        run: apk add --no-cache musl-dev file github-cli
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # --target is explicit so +crt-static applies only to bat, not to the
+      # proc-macros built for the host (musl cannot build those static).
+      - name: Build
+        env:
+          RUSTFLAGS: -C target-feature=+crt-static
+        run: cargo build --release --locked --target "$TARGET"
+
+      - name: Check the binary is static and renders Mermaid
+        run: |
+          bin="target/$TARGET/release/bat"
+          file "$bin" | tee /dev/stderr | grep -q 'static'
+          printf 'flowchart LR\nA --> B\nA -.-> B\n' > smoke.mmd
+          "$bin" --mermaid=always --plain --color=never smoke.mmd | tee /dev/stderr | grep -q '►'
+
+      - name: Package
+        run: |
+          mkdir dist
+          cp "target/$TARGET/release/bat" "dist/bat-$TARGET"
+          cd dist && sha256sum "bat-$TARGET" > "bat-$TARGET.sha256"
+
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: dist/bat-${{ env.TARGET }}
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)
+          mermaid=$(grep -A2 '^name = "pi-mermaid"' Cargo.lock | sed -n 's/^source = "\(.*\)"/\1/p')
+          tag="bat-$version-mermaid.$GITHUB_RUN_NUMBER"
+          cat > notes.md <<EOF
+          Static \`$TARGET\` build of bat $version with Mermaid diagram rendering.
+
+          - bat commit: $GITHUB_SHA
+          - pi-mermaid: $mermaid
+
+          Download and verify:
+
+          \`\`\`sh
+          curl -LO https://github.com/$GITHUB_REPOSITORY/releases/latest/download/bat-$TARGET
+          curl -LO https://github.com/$GITHUB_REPOSITORY/releases/latest/download/bat-$TARGET.sha256
+          sha256sum -c bat-$TARGET.sha256
+          gh attestation verify bat-$TARGET --repo $GITHUB_REPOSITORY
+          install -m 755 bat-$TARGET ~/.local/bin/bat
+          \`\`\`
+          EOF
+          gh release create "$tag" dist/* --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" --title "$tag" --notes-file notes.md
