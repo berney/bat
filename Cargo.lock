@@ -1694,9 +1694,9 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
 name = "html-escape"
-version = "0.2.15"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c9356095b4b41197bba32173600e1582792cda618f65d12f68e2e77d273413c5"
+checksum = "d45ed4d99334da2a2f221504e8ffc8ad09baf2a452b154465a976bfde697b004"
 
 [[package]]
 name = "id-arena"
@@ -2018,7 +2018,8 @@ checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
 
 [[package]]
 name = "pi-mermaid"
-version = "18.13.3"
+version = "18.20.0"
+source = "git+https://github.com/berney/oh-my-pi?rev=c8b78c7e2e9c08cf1137eee1f4c0ba95d76d89c5#c8b78c7e2e9c08cf1137eee1f4c0ba95d76d89c5"
 dependencies = [
  "html-escape",
  "unicode-segmentation",
